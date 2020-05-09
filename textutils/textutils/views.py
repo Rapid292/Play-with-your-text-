@@ -3,7 +3,7 @@
 
 from django.http import HttpResponse
 from django.shortcuts import render
-
+import random
 
 def index(request):
     return render(request, 'index.html')
@@ -16,7 +16,7 @@ def analyze(request):
     fullcaps = request.POST.get('fullcaps', 'off')
     newremoveline = request.POST.get('newremoveline', 'off')
     extraspaceremover = request.POST.get('extraspaceremover', 'off')
-
+    encrypt_text = request.POST.get('encrypt_text', 'off')
 
     if removepunc == 'on':
         punctuations = '''!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~'''
@@ -50,7 +50,22 @@ def analyze(request):
         params = {'purpose': 'Extra spaces are removed', 'analyzed_text': analyzed}
         djtext = analyzed
 
-    if (removepunc == 'on' or fullcaps == 'on' or newremoveline == 'on' or extraspaceremover == 'on'):
+    if encrypt_text == 'on':
+        djtext = djtext.upper()
+        analyzed = ''
+        for char in djtext:
+            if char == ' ':
+                l = ord(char)
+            else:
+                l = ord(char) - 2
+                if l < 65:
+                    l = l + 26
+            analyzed += chr(l)
+        params = {'purpose': 'Encrypted Message', "analyzed_text": analyzed}
+
+
+
+    if (removepunc == 'on' or fullcaps == 'on' or newremoveline == 'on' or extraspaceremover == 'on' or encrypt_text == 'on'):
         return render(request, 'analyze.html', params)
 
     else:
